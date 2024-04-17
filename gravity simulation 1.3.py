@@ -258,24 +258,29 @@ while state:
         
         
         elif event.type == pygame.MOUSEBUTTONDOWN: #Si pulso el click y !createKey
-            if not createKey:
+            if not createKey and not vectorKey: #Este bloque debe estar acá porque almacena el primer click
                 createKey = True #En el primer click creayeKey es False y se activa y se guarda la información de la posición inicial del mouse
                 xMouseDown, yMouseDown = pygame.mouse.get_pos()
             
             # if vectorKey: #Si ya pasé por una iteración y cree un planeta, entonces en el if de mas abajo ya se activó vectorKey == True así que se ejecutará este bloque
             #     xMouseDown, yMouseDown = pygame.mouse.get_pos()
             # if vectorKey: #Vector será True luego de haber usado createKey. Ahora dibujo el vector
+            
+            else: #Si hacemos click y está vector activado
+                vectorKey = False
+                
 
         elif event.type == pygame.MOUSEBUTTONUP: #Si suelto el click
             if createKey: #si createKey == True se desactiva y almaceno la ultima posición del mouse
                 createKey = False #impide volver a entrar a este bloque una vez que se suelte el click
                 vectorKey = True #Luego de crear el planeta se activa la creación del vector
                 xMouseUp, yMouseUp = pygame.mouse.get_pos()
+
             if not vectorKey: #Cuando suelte el mouse por segunda vez con createVector = True (que pasará a falso en este bloque para finalizar el proceso de creación), creo definitivamente el planeta que diseñé
                 vectorKey = False
                 #Si estoy creando el vector (es decir que createKey == False and vectorKey == True)
                 # vectorKey = False
-                xMouseUp, yMouseUp = pygame.mouse.get_pos()
+                xMouseUp, yMouseUp = xMouseStillDown, yMouseStillDown
                 module = dist_euc(xMouseDown, yMouseDown, xMouseUp, yMouseUp)
                 # Calcular la diferencia en coordenadas
                 dx = xMouseUp - xMouseDown
@@ -325,7 +330,7 @@ while state:
         x,y,radio,name = drawTempPlanet(xMouseDown,yMouseDown,xMouseStillDown,yMouseStillDown) #Dibujo el planeta con tamaño fijo que creayeKey ya no puede dibujar
         
         vectorxMouseStillDown, vectoryMouseStillDown = pygame.mouse.get_pos() #posición de la punta del vector
-        pygame.draw.line(disp, (50,50,255), (xMouseDown, yMouseDown), (vectorxMouseStillDown, vectoryMouseStillDown), 5)
+        pygame.draw.line(disp, (50,50,255), (xMouseDown, yMouseDown), (vectorxMouseStillDown, vectoryMouseStillDown), 2)
 
      
     else:
