@@ -159,6 +159,10 @@ def comp(p,q):#Divide aceleración entre componentes c e y
         
 font = pygame.font.Font("freesansbold.ttf",10)
 
+# def showVector(i):
+#     #Tomo las componentes del elemento y formo el vector y lo dibujo como linea desde el radio
+#     modulo = i.dx
+
 def showMass(i): #Mostrar masa
     textMass = font.render("Mass: " + str(math.trunc(i.m)),True,(255,255,255))
     disp.blit(textMass,(i.x,i.y))
@@ -273,30 +277,34 @@ while state:
                 #Si estoy creando el vector (es decir que createKey == False and vectorKey == True)
                 # vectorKey = False
                 xMouseUp, yMouseUp = xMouseStillDown, yMouseStillDown #Estas componentes corresponden al proceso de creación del radio/planeta
-                module = dist_euc(xMouseDown, yMouseDown, vectorxMouseStillDown, vectoryMouseStillDown)/100 #Estas componentes corresponden al proceso de creación del vector
+                module = dist_euc(xMouseDown, yMouseDown, vectorxMouseStillDown, vectoryMouseStillDown)#Estas componentes corresponden al proceso de creación del vector
                 
                 # Calcular la diferencia en coordenadas
                 dx = (xMouseUp - vectorxMouseStillDown)
                 dy = (yMouseUp - vectoryMouseStillDown)
 
                 # Calcular el ángulo utilizando math.atan2
-                angle_rad = math.atan2(dy, dx)
+                angleVar = math.atan2(dx, dy)
+                #corrección de angulo
+                angleVar = angleVar + math.pi if angleVar >= 0 else angleVar-math.pi
+                
+                
+                # print(angle)
                 
                 #calculo componentes de velocidad
-                vx = module * math.sin(angle_rad)
-                vy = module * math.cos(angle_rad)
+                dx = math.cos(angleVar) * module * 0.001
+                dy = math.sin(angleVar) * module * 0.001
                 
-                dx += vx
-                dy += vy
+                # dx = dx + vx
+                # dy = dy + vy
                 
                 radius = math.sqrt((xMouseDown - xMouseUp)**2 + (yMouseDown - yMouseUp)**2)
                 r = random.randint(0, 255)
                 g = random.randint(0, 255)
                 b = random.randint(0, 255)
                 
-                new_planet = planet(xMouseDown, yMouseDown, math.pow(1.2,radius), int(radius), r, g, b, names[random.randint(0,len(names)-1)], dx, dy)
+                new_planet = planet(xMouseDown, yMouseDown, math.pow(1.2,radius), int(radius), r, g, b, names[random.randint(0,len(names)-1)], dy, dx)
                 planets.append(new_planet)
-                print(module)
                     
                 
 
@@ -318,11 +326,11 @@ while state:
                 # dy = (yMouseUp - vectoryMouseStillDown)
 
                 # # Calcular el ángulo utilizando math.atan2
-                # angle_rad = math.atan2(dy, dx)
+                # angle = math.atan2(dy, dx)
                 
                 # #calculo componentes de velocidad
-                # vx = module * math.sin(angle_rad)
-                # vy = module * math.cos(angle_rad)
+                # vx = module * math.sin(angle)
+                # vy = module * math.cos(angle)
                 
                 # dx += vx
                 # dy += vy
