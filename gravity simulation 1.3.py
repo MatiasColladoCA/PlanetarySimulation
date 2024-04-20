@@ -32,8 +32,8 @@ from turtle import update
 import pygame,math,random
 pygame.init()
 G=0.01
-h=600
-w=1000
+h=1000
+w=2000
 disp= pygame.display.set_mode((w,h))
 pygame.display.update()
 pygame.display.set_caption("Let's predict the Universe")
@@ -107,13 +107,13 @@ class planet():#aca ocurre la creacion del planeta
 
 
 ##Funciones
-def draw_vector(surface, start_pos, angle, magnitude, color):
-    # Calcular el punto final del vector
-    end_pos = (
-        start_pos[0] + magnitude * math.cos(math.radians(angle)),
-        start_pos[1] + magnitude * math.sin(math.radians(angle))
-    )
-    pygame.draw.line(surface, color, start_pos, end_pos, 3)  # Grosor de 3 para el vector
+# def draw_vector(surface, start_pos, angle, magnitude, color):
+#     # Calcular el punto final del vector
+#     end_pos = (
+#         start_pos[0] + magnitude * math.cos(math.radians(angle)),
+#         start_pos[1] + magnitude * math.sin(math.radians(angle))
+#     )
+#     pygame.draw.line(surface, color, start_pos, end_pos, 3)  # Grosor de 3 para el vector
 
 
 def truncar5(x): #Truncar a 5 decimales
@@ -159,9 +159,23 @@ def comp(p,q):#Divide aceleración entre componentes c e y
         
 font = pygame.font.Font("freesansbold.ttf",10)
 
-# def showVector(i):
-#     #Tomo las componentes del elemento y formo el vector y lo dibujo como linea desde el radio
-#     modulo = i.dx
+def showVector(x_centro, y_centro, x_final, y_final):
+    pygame.draw.line(disp,(50,50,255),(x_centro,y_centro),(x_final,y_final),2)
+
+def showVectorCalculation(i):
+    #Tomo las componentes del elemento y formo el vector y lo dibujo como linea desde el radio
+    # modulo = (i.dx**2 + dy**2)**0.05
+    
+    x_centro = i.x
+    y_centro = i.y
+    
+    dx = i.dx
+    dy = i.dy
+    
+    x_final = x_centro - dx
+    y_final = y_centro - dy
+    
+    draw_vector(x_centro, y_centro, x_final, y_final)
 
 def showMass(i): #Mostrar masa
     textMass = font.render("Mass: " + str(math.trunc(i.m)),True,(255,255,255))
@@ -218,8 +232,9 @@ nameKey = False
 massKey = False
 pathKey = False
 posKey = False
+showVectorKey = False
 createKey = False
-vectorKey = False
+vectorCreatingKey = False
 xMouseUp = 0
 yMouseUp = 0
 mouseIsPar = False #si el mouse está levantado, esto cambia de signo. comienza con False. luego de un click completo, cambia designo.
@@ -261,21 +276,19 @@ while state:
                 pathKey = not pathKey
             if event.key == pygame.K_p:
                 posKey = not posKey
+            if event.key == pygame.K_v:
+                showVectorKey = not showVectorKey
         
         
         elif event.type == pygame.MOUSEBUTTONDOWN: #Si pulso el click y !createKey
-            if not createKey and not vectorKey: #Este bloque debe estar acá porque almacena el primer click
+            if not createKey and not vectorCreatingKey: #Este bloque debe estar acá porque almacena el primer click
                 createKey = True #En el primer click creayeKey es False y se activa y se guarda la información de la posición inicial del mouse
                 xMouseDown, yMouseDown = pygame.mouse.get_pos()
             
-            # if vectorKey: #Si ya pasé por una iteración y cree un planeta, entonces en el if de mas abajo ya se activó vectorKey == True así que se ejecutará este bloque
-            #     xMouseDown, yMouseDown = pygame.mouse.get_pos()
-            # if vectorKey: #Vector será True luego de haber usado createKey. Ahora dibujo el vector
-            
-            elif not createKey and vectorKey: #Si hacemos click y está vector activado
-                vectorKey = False
-                #Si estoy creando el vector (es decir que createKey == False and vectorKey == True)
-                # vectorKey = False
+            elif not createKey and vectorCreatingKey: #Si hacemos click y está vector activado
+                vectorCreatingKey = False
+                #Si estoy creando el vector (es decir que createKey == False and vectorCreatingKey == True)
+                # vectorCreatingKey = False
                 xMouseUp, yMouseUp = xMouseStillDown, yMouseStillDown #Estas componentes corresponden al proceso de creación del radio/planeta
                 module = dist_euc(xMouseDown, yMouseDown, vectorxMouseStillDown, vectoryMouseStillDown)#Estas componentes corresponden al proceso de creación del vector
                 
@@ -311,38 +324,8 @@ while state:
         elif event.type == pygame.MOUSEBUTTONUP: #Si suelto el click
             if createKey: #si createKey == True se desactiva y almaceno la ultima posición del mouse
                 createKey = False #impide volver a entrar a este bloque una vez que se suelte el click
-                vectorKey = True #Luego de crear el planeta se activa la creación del vector
+                vectorCreatingKey = True #Luego de crear el planeta se activa la creación del vector
                 xMouseUp, yMouseUp = pygame.mouse.get_pos()
-
-            # if not vectorKey: #Cuando suelte el mouse por segunda vez con createVector = True (que pasará a falso en este bloque para finalizar el proceso de creación), creo definitivamente el planeta que diseñé
-                # vectorKey = False
-                # #Si estoy creando el vector (es decir que createKey == False and vectorKey == True)
-                # # vectorKey = False
-                # xMouseUp, yMouseUp = xMouseStillDown, yMouseStillDown #Estas componentes corresponden al proceso de creación del radio/planeta
-                # module = dist_euc(xMouseDown, yMouseDown, vectorxMouseStillDown, vectoryMouseStillDown)/100 #Estas componentes corresponden al proceso de creación del vector
-                
-                # # Calcular la diferencia en coordenadas
-                # dx = (xMouseUp - vectorxMouseStillDown)
-                # dy = (yMouseUp - vectoryMouseStillDown)
-
-                # # Calcular el ángulo utilizando math.atan2
-                # angle = math.atan2(dy, dx)
-                
-                # #calculo componentes de velocidad
-                # vx = module * math.sin(angle)
-                # vy = module * math.cos(angle)
-                
-                # dx += vx
-                # dy += vy
-                
-                # radius = math.sqrt((xMouseDown - xMouseUp)**2 + (yMouseDown - yMouseUp)**2)
-                # r = random.randint(0, 255)
-                # g = random.randint(0, 255)
-                # b = random.randint(0, 255)
-                
-                # new_planet = planet(xMouseDown, yMouseDown, math.pow(1.2,radius), int(radius), r, g, b, names[random.randint(0,len(names)-1)], dx, dy)
-                # planets.append(new_planet)
-                # print(module)
                     
             
     if  pause == True:
@@ -361,6 +344,8 @@ while state:
             showPath(rp)
         if posKey:
             showPos(rp)
+        if showVectorKey:
+            showVectorCalculation(p)
 
     
     if createKey:
@@ -369,7 +354,7 @@ while state:
         # pygame.draw.circle(window, (255, 255, 255), (xMouseDown, yMouseDown), radius, 1)
         x,y,radio,name = drawTempPlanet(xMouseDown,yMouseDown,xMouseStillDown,yMouseStillDown)
         
-    if vectorKey:
+    if vectorCreatingKey:
         x,y,radio,name = drawTempPlanet(xMouseDown,yMouseDown,xMouseStillDown,yMouseStillDown) #Dibujo el planeta con tamaño fijo que creayeKey ya no puede dibujar
         
         vectorxMouseStillDown, vectoryMouseStillDown = pygame.mouse.get_pos() #posición de la punta del vector
@@ -378,7 +363,8 @@ while state:
         moduleText = font.render(str(moduleNumber),True,(255,255,255))
         disp.blit(moduleText, (vectorxMouseStillDown+20, vectoryMouseStillDown+20))
 
-     
+    
+    
     else:
         if mouseIsPar:
             re = random.randint(0,255)
