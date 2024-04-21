@@ -27,10 +27,13 @@
 #Va a ser mejor cuando existan agujeros negros, colisiones con perdida de masa y particulas, y fusionamiento de astros.
 #Mostrar grafica con radio y masa de cada planeta en pantalla.
 #si los planetas no llegan al centro del que los está atrayendo, no saldran disparados, mejorar colisiones
+#Sistema de guardado y cargado
 
 
 from turtle import update
 import pygame,math,random
+import pickle
+
 pygame.init()
 
 h=2000
@@ -227,6 +230,20 @@ def drawTempPlanet(xDown,yDown,xStillDown,yStillDown):
     return xStillDown,yStillDown,radio,p.name #¿Funcion que retorna varias variables?o como
 
 
+def saveCurrentState(planets, G):
+    datos_guardar = {"planets":planets, "G":G}
+    with open("datos_guardados.pkl","wb") as archivo:
+        pickle.dump(datos_guardar, archivo)
+
+def loadSavedState():
+    global planets, G
+    with open("datos_guardados", "rb") as archivo:
+        datos_cargados = pickle.load(archivo)
+        planets = datos_cargados["planets"]
+        G = datos_cargados["G"]
+    
+
+
 #Creación de planetas
 for i in range(0):
     re = random.randint(0,255)
@@ -245,6 +262,8 @@ massKey = False
 pathKey = False
 posKey = False
 showVectorKey = False
+saveKey = False
+loadKey = False
 
 #Creation
 createKey = False
@@ -280,6 +299,10 @@ while state:
     x,y = movContMouse(0.05)
     # disp.blit(fondoM3,(x,y))
     # 
+    
+    if loadKey:
+        loadSavedState(planets,G)
+    
     cont += 1
     if cont == 100:
         cont = 0
@@ -306,6 +329,8 @@ while state:
                 quitCreatingKey = not quitCreatingKey
             if event.key == pygame.K_i:
                 infoKey = not infoKey
+            if event.key == pygame.K_s:
+                saveKey = not saveKey
         
         
         # Bloque de creación
@@ -392,6 +417,10 @@ while state:
         moduleText = font.render(str(moduleNumber),True,(255,255,255))
         disp.blit(moduleText, (vectorxMouseStillDown+20, vectoryMouseStillDown+20))
 
+    if saveKey:
+        saveCurrentState(planets, G)
+
+    
     else:
         if mouseIsPar:
             re = random.randint(0,255)
